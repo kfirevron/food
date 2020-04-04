@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { View, ScrollView, Text, StyleSheet } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
 
-import useResults from "../hooks/useResults";
+import { getRests } from "../actions";
+
+//import useResults from "../hooks/useResults";
 import SearchBar from "../components/SearchBar";
 import ResultsList from "../components/ResultsList";
 
 const SearchScreen = () => {
   const [term, setTerm] = useState("");
-  const [searchApi, errorMessage, results] = useResults();
+  const { error, rests } = useSelector((state) => state.results);
 
-  const filterResultsByPrice = price => {
-    return results.filter(result => result.price === price);
+  const dispatch = useDispatch();
+
+  const filterResultsByPrice = (price) => {
+    return rests.filter((result) => result.price === price);
   };
 
   return (
@@ -18,19 +23,16 @@ const SearchScreen = () => {
       <SearchBar
         term={term}
         onTermChange={setTerm}
-        onTermSubmit={() => searchApi(term)}
+        onTermSubmit={() => dispatch(getRests(term))}
       />
-      {errorMessage ? <Text>{errorMessage}</Text> : null}
-      <Text>We have found {results.length} results.</Text>
+      {error ? <Text>{error}</Text> : null}
+      <Text>We have found {rests.length} results.</Text>
       <ScrollView>
         <ResultsList
           results={filterResultsByPrice("$")}
           title="Cost Effictive"
         />
-        <ResultsList
-          results={filterResultsByPrice("$$")}
-          title="Bit Pricer"
-        />
+        <ResultsList results={filterResultsByPrice("$$")} title="Bit Pricer" />
         <ResultsList
           results={filterResultsByPrice("$$$")}
           title="Big Spender"
