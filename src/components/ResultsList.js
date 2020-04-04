@@ -1,23 +1,50 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity
+} from "react-native";
+import { withNavigation } from "react-navigation";
+import ResultDetail from "./ResultDetail";
 
-import ResultDetail from './ResultDetail';
-
-const ResultsList = ({ title, results }) => {
+const ResultsList = ({ title, results, navigation }) => {
+  if(!results.length){
+    return null;
+  }
   return (
-    <View>
-      <Text>{title}</Text>
-      <FlatList 
-        horizontal 
+    <View style={styles.container}>
+      <Text style={styles.title}>{title}</Text>
+      <FlatList
+        horizontal
         scrollEnabled
-        data={results} 
-        keyExtractor={result => result.id} 
-        renderItem={({item})=>{
-            return <ResultDetail item={item}/>
+        showsHorizontalScrollIndicator={false}
+        data={results}
+        keyExtractor={result => result.id}
+        renderItem={({ item }) => {
+          return (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ResultsShow",{id:item.id})}
+            >
+              <ResultDetail item={item} />
+            </TouchableOpacity>
+          );
         }}
       />
     </View>
   );
 };
 
-export default ResultsList;
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 10
+  },
+  title: {
+    marginLeft: 15,
+    fontWeight: "bold",
+    marginBottom: 5
+  }
+});
+
+export default withNavigation(ResultsList);
